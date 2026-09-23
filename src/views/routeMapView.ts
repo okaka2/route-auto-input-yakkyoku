@@ -10,6 +10,8 @@ export type RouteMapHandlers = {
   onOpenRoute(routeIndex: number): void;
   onBack(): void;
   onChooseStops(): void;
+  /** 「ルートを共有」。確認と共有(LINEなど)は呼び出し側が行う。 */
+  onShare(): void;
 };
 
 /** done: 開いた / next: 次に開く(最初の未開封) / later: それ以降 */
@@ -53,8 +55,28 @@ export function renderRouteMap(
     const cardState: CardState = opened.has(index) ? 'done' : index === nextIndex ? 'next' : 'later';
     cards.append(renderRouteCard(route, index, cardState, opened.get(index) ?? '', provider, handlers));
   });
-  container.append(cards);
+  container.append(cards, renderShare(handlers));
   return container;
+}
+
+/** 別の人に送るための共有ボタン。受け取った人はURLを開くだけで、同じルートの地図を使える。 */
+function renderShare(handlers: RouteMapHandlers): HTMLElement {
+  const card = document.createElement('section');
+  card.className = 'card share-card';
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'block';
+  button.dataset.testid = 'share-routes';
+  button.textContent = 'ルートを共有(LINEなど)';
+  button.addEventListener('click', () => handlers.onShare());
+
+  const note = document.createElement('p');
+  note.className = 'hint';
+  note.textContent = '受け取った人は、URLを開くだけで同じルートの地図を使えます。案内は開いた人の現在地から始まります。';
+
+  card.append(button, note);
+  return card;
 }
 
 function renderEmpty(handlers: RouteMapHandlers): HTMLElement {

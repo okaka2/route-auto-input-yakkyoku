@@ -650,6 +650,69 @@ describe('合言葉のロック画面', () => {
   });
 });
 
+describe('地図の画面からルートを共有', () => {
+  async function openMapWithOnePatient(): Promise<void> {
+    const { savePatient } = await import('../src/db');
+    const { createPatient } = await import('../src/patient');
+    const patient = createPatient('山田太郎', '東京都千代田区1-1');
+    await savePatient(patient);
+    window.localStorage.setItem(
+      SESSION_KEY,
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        selectedIds: [patient.id],
+        opened: [{ index: 0, at: '' }],
+      }),
+    );
+    await import('../src/main');
+    await waitFor(() => expect(el('[data-testid="share-routes"]')).not.toBeNull());
+    // 起動直後の読み込みで訪問先が反映されるまで待つ(ルートのカードに名前が出る)。
+    await waitFor(() => expect(document.body.textContent).toContain('山田太郎'));
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('確認でキャンセルすると、共有しない', async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { ...window.navigator, share });
+    await openMapWithOnePatient();
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+    el<HTMLButtonElement>('[data-testid="share-routes"]')!.click();
+
+    expect(window.confirm).toHaveBeenCalled();
+    expect(share).not.toHaveBeenCalled();
+  });
+
+  it('確認で許可すると、住所入りのGoogleマップのURLを共有する(名前は含めない)', async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { ...window.navigator, share });
+    await openMapWithOnePatient();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    el<HTMLButtonElement>('[data-testid="share-routes"]')!.click();
+
+    await waitFor(() => expect(share).toHaveBeenCalledTimes(1));
+    const text = share.mock.calls[0]![0].text as string;
+    expect(text).toContain('https://www.google.com/maps/dir/');
+    expect(text).not.toContain('山田太郎');
+  });
+
+  it('共有メニューが無い端末では、コピーして案内する', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { ...window.navigator, share: undefined, clipboard: { writeText } });
+    await openMapWithOnePatient();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    el<HTMLButtonElement>('[data-testid="share-routes"]')!.click();
+
+    await waitFor(() => expect(el('.message')?.textContent).toContain('コピーしました'));
+    expect(writeText).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('地図を開く画面', () => {
   async function seedOnePatient(): Promise<{ id: string }> {
     const { savePatient } = await import('../src/db');

@@ -64,3 +64,21 @@ describe('buildGoogleMapsUrl', () => {
     }
   });
 });
+
+describe('buildGoogleMapsUrl: 開いた人の現在地から出発する(fromCurrentLocation)', () => {
+  it('出発地を付けず、最後を目的地、それ以外を経由地にする', () => {
+    const url = new URL(buildGoogleMapsUrl(['A', 'B', 'C'], { fromCurrentLocation: true }));
+    expect(url.origin + url.pathname).toBe('https://www.google.com/maps/dir/');
+    expect(url.searchParams.get('origin')).toBeNull();
+    expect(url.searchParams.get('waypoints')).toBe('A|B');
+    expect(url.searchParams.get('destination')).toBe('C');
+    expect(url.searchParams.get('travelmode')).toBe('driving');
+  });
+
+  it('1件でも地点検索ではなく、現在地からの経路にする', () => {
+    const url = new URL(buildGoogleMapsUrl(['A'], { fromCurrentLocation: true }));
+    expect(url.origin + url.pathname).toBe('https://www.google.com/maps/dir/');
+    expect(url.searchParams.get('destination')).toBe('A');
+    expect(url.searchParams.get('waypoints')).toBeNull();
+  });
+});

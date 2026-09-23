@@ -19,6 +19,7 @@ import { checkPassword, isUnlocked, renderPasswordGate, unlock } from './passwor
 import { createPatient, updatePatientFields } from './patient';
 import { splitIntoRoutes } from './routeSplitter';
 import { clearSession, loadSession, saveSession } from './session';
+import { buildShareText, shareText } from './share';
 import { registerServiceWorkerUpdates } from './swUpdate';
 import {
   clearSelection,
@@ -369,6 +370,37 @@ function handleOpenRoute(routeIndex: number): void {
   }
 }
 
+/**
+ * 地図の画面の「ルートを共有」。住所が送信先へ渡るので、先に確認を取る。
+ * スマホでは共有メニュー(LINEなど)、それが無いPCなどではクリップボードへコピーする。
+ */
+async function handleShareRoutes(): Promise<void> {
+  const addresses = selectedPatients(state).map((patient) => patient.address);
+  if (addresses.length === 0) {
+    return;
+  }
+  const question =
+    `訪問先の住所(${addresses.length}件)が、送った相手と、送るのに使うアプリ(LINEなど)に渡ります。` +
+    '名前は含まれません。共有しますか?';
+  if (!window.confirm(question)) {
+    return;
+  }
+  try {
+    const text = buildShareText(addresses, MAX_STOPS_PER_ROUTE, DEFAULT_MAP_PROVIDER);
+    const result = await shareText(text);
+    if (result === 'copied') {
+      setState(
+        withMessage(state, {
+          kind: 'info',
+          text: 'ルートのURLをコピーしました。LINEなどに貼り付けて送ってください。',
+        }),
+      );
+    }
+  } catch {
+    setState(withMessage(state, { kind: 'error', text: 'ルートを共有できませんでした。' }));
+  }
+}
+
 function handleExport(): void {
   try {
     const date = new Date().toISOString().slice(0, 10);
@@ -498,6 +530,9 @@ function renderScreen(): HTMLElement {
         onOpenRoute: handleOpenRoute,
         onBack: () => setState(withScreen(state, { name: 'order' })),
         onChooseStops: () => setState(withScreen(state, { name: 'list' })),
+        onShare: () => {
+          void handleShareRoutes();
+        },
       });
     case 'settings':
       return renderSettings(state, {

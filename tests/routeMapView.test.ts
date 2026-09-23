@@ -11,6 +11,7 @@ const handlers = (): RouteMapHandlers => ({
   onOpenRoute: vi.fn(),
   onBack: vi.fn(),
   onChooseStops: vi.fn(),
+  onShare: vi.fn(),
 });
 
 function makeStops(count: number): Patient[] {
@@ -220,5 +221,26 @@ describe('renderRouteMap: 訪問先が選ばれていないとき', () => {
     expect(cards(element)).toHaveLength(0);
     element.querySelector<HTMLButtonElement>('[data-testid="choose-stops-button"]')!.click();
     expect(spies.onChooseStops).toHaveBeenCalledTimes(1);
+  });
+
+  it('共有ボタンは出さない', () => {
+    const element = render(createInitialState([]));
+    expect(element.querySelector('[data-testid="share-routes"]')).toBeNull();
+  });
+});
+
+describe('renderRouteMap: ルートの共有', () => {
+  it('「ルートを共有」ボタンを出し、押すと onShare が呼ばれる', () => {
+    const spies = handlers();
+    const element = render(stateWithSelection(3), new Map(), spies);
+    const button = element.querySelector<HTMLButtonElement>('[data-testid="share-routes"]')!;
+    expect(button.textContent).toContain('ルートを共有');
+    button.click();
+    expect(spies.onShare).toHaveBeenCalledTimes(1);
+  });
+
+  it('共有すると、開いた人の現在地から始まることを添えて案内する', () => {
+    const element = render(stateWithSelection(3));
+    expect(element.textContent).toContain('現在地から');
   });
 });

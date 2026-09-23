@@ -1,4 +1,4 @@
-import { buildGoogleMapsUrl } from './googleMapsUrl';
+import { buildGoogleMapsUrl, type MapUrlOptions } from './googleMapsUrl';
 
 /**
  * 地図サービスの差し替え口。画面は MapProvider だけを知り、URLの作り方や
@@ -10,8 +10,11 @@ export type MapProvider = {
   id: string;
   /** 「〇〇で開く」の〇〇に入る、サービスの表示名 */
   label: string;
-  /** 訪問順に並んだ住所から、地図を開くURLを作る。1件なら地点検索、2件以上なら経路。 */
-  buildUrl(addresses: readonly string[]): string;
+  /**
+   * 訪問順に並んだ住所から、地図を開くURLを作る。1件なら地点検索、2件以上なら経路。
+   * options.fromCurrentLocation なら、開いた人の現在地から出発する経路にする(共有用)。
+   */
+  buildUrl(addresses: readonly string[], options?: MapUrlOptions): string;
 };
 
 export const googleMapsProvider: MapProvider = {
