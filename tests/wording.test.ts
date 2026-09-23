@@ -22,8 +22,9 @@ import { renderSettings } from '../src/views/settingsView';
 import { renderTabBar } from '../src/views/tabBar';
 
 // 画面に出してはいけない、業種特有の表現と、以前のアプリ名。
-// 「利用者」は、初期設定のラベル(defaultLabels.ts)で使うため、CSV版では解禁している。
-const FORBIDDEN = ['患者', '薬局', '在宅', '医療', 'ルート自動入力'];
+// 「利用者」「患者」「薬局」は、薬局版ではアプリ名・初期設定のラベル(defaultLabels.ts)で
+// 使うため解禁している。
+const FORBIDDEN = ['在宅', '医療', 'ルート自動入力'];
 
 function expectClean(label: string, text: string): void {
   for (const word of FORBIDDEN) {

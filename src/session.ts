@@ -22,7 +22,7 @@ export type SessionRecord = {
   timestamp: string;
 };
 
-const STORAGE_KEY = 'route-auto-input-csv:session';
+const STORAGE_KEY = 'route-auto-input-yakkyoku:session';
 const MAX_AGE_MS = 12 * 60 * 60 * 1000;
 
 function isOpenedRoute(value: unknown): value is OpenedRoute {

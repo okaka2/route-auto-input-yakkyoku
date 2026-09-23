@@ -2,7 +2,7 @@ import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import { DEFAULT_LABELS } from './defaultLabels';
 import type { Patient } from './types';
 
-const DB_NAME = 'route-auto-input-csv';
+const DB_NAME = 'route-auto-input-yakkyoku';
 const DB_VERSION = 2;
 const STORE = 'patients';
 const META_STORE = 'meta';

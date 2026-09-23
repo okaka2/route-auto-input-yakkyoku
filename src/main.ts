@@ -372,7 +372,7 @@ function handleOpenRoute(routeIndex: number): void {
 function handleExport(): void {
   try {
     const date = new Date().toISOString().slice(0, 10);
-    downloadTextFile(`route-auto-input-csv-${date}.json`, serializeBackup(state.patients, new Date(), state.labels));
+    downloadTextFile(`route-auto-input-yakkyoku-${date}.json`, serializeBackup(state.patients, new Date(), state.labels));
     setState(withMessage(state, { kind: 'info', text: 'バックアップを書き出しました。' }));
   } catch {
     setState(withMessage(state, { kind: 'error', text: 'バックアップを書き出せませんでした。' }));

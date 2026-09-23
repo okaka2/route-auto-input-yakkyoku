@@ -1,10 +1,12 @@
-# 訪問ルート作成CSV版
+# 訪問ルート作成 薬局版
 
 複数の訪問先を選び、訪問順を決めて、地図アプリ(Googleマップ)でルートを開くWebアプリ(PWA)です。
 iPad・iPhone・PCのブラウザで使えます。ホーム画面に追加すると、アプリのように起動できます。
 
-[訪問ルート作成](https://github.com/okaka2/route-auto-input)(基本版)を元にした派生版で、
-外部ソフトが出力するCSVファイルから、名前・住所を取り込む機能が追加されています。
+[訪問ルート作成](https://github.com/okaka2/route-auto-input)(基本版)を元にした薬局向けの派生版です。
+CSV版と同じく、外部ソフトが出力するCSVファイルから名前・住所を取り込む機能と、
+訪問先をラベルで分類・絞り込む機能があります。初回起動時には「患者名」「個人宅」「施設」の
+3つのラベルが用意されています(設定画面で自由に追加・削除できます)。
 
 ## 使い方(3ステップ)
 
@@ -46,7 +48,7 @@ npm run icons      # assets/icon.svg から PWA アイコンを生成
 
 ## 公開の手順(初回のみ)
 
-1. github.com で `route-auto-input-csv` という名前のリポジトリを作る。
+1. github.com で `route-auto-input-yakkyoku` という名前のリポジトリを作る。
    **無料アカウントでGitHub Pagesを使うにはPublic(公開)にする必要がある。**
    公開されるのはアプリのコードだけで、訪問先のデータは含まれない。
 2. GitHubのリポジトリ → Settings → Pages → Build and deployment → Source を
@@ -55,7 +57,7 @@ npm run icons      # assets/icon.svg から PWA アイコンを生成
 
    ```bash
    git branch -M main
-   git remote add origin https://github.com/<GitHubユーザー名>/route-auto-input-csv.git
+   git remote add origin https://github.com/<GitHubユーザー名>/route-auto-input-yakkyoku.git
    git push -u origin main
    ```
 
@@ -63,7 +65,7 @@ npm run icons      # assets/icon.svg から PWA アイコンを生成
    **手順2を先に済ませていても、初回の実行が失敗(赤いX)になることがある。**
    その場合はActionsタブから失敗したワークフローを開き、「Re-run jobs」で
    再実行すれば通常は成功する。
-5. `https://<GitHubユーザー名>.github.io/route-auto-input-csv/` が公開URL。
+5. `https://<GitHubユーザー名>.github.io/route-auto-input-yakkyoku/` が公開URL。
 
 以降は `main` に push するたびに自動で公開される。
 
@@ -89,7 +91,7 @@ Googleマップの公式仕様では、経路URLの経由地の上限は
 
 ## 実機テスト(iPad・iPhoneで一度行う)
 
-- [ ] Safariで公開URLを開き、「ホーム画面に追加」ができる(名前は「訪問ルート作成CSV版」)
+- [ ] Safariで公開URLを開き、「ホーム画面に追加」ができる(名前は「訪問ルート作成 薬局版」)
 - [ ] ホーム画面のアイコンから起動すると、アドレスバーのない(standalone)表示になる
 - [ ] 下部のタブと選択バーが、ホームインジケータと重ならない
 - [ ] 横向きにしても崩れない

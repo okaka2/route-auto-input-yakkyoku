@@ -10,7 +10,7 @@ beforeEach(() => {
 
 describe('checkPassword', () => {
   it('正しい合言葉ならtrue', () => {
-    expect(checkPassword('houmon-csv2026')).toBe(true);
+    expect(checkPassword('houmon-ph2026')).toBe(true);
   });
 
   it('違う合言葉ならfalse', () => {
@@ -71,11 +71,11 @@ describe('renderPasswordGate', () => {
     document.body.append(element);
     try {
       const input = q<HTMLInputElement>(element, 'password-input');
-      input.value = 'houmon-csv2026';
+      input.value = 'houmon-ph2026';
       const form = element.querySelector('form')!;
       const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
       form.dispatchEvent(submitEvent);
-      expect(handlers.onSubmit).toHaveBeenCalledWith('houmon-csv2026');
+      expect(handlers.onSubmit).toHaveBeenCalledWith('houmon-ph2026');
       expect(submitEvent.defaultPrevented).toBe(true);
     } finally {
       element.remove();

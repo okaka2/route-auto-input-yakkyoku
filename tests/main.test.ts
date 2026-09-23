@@ -10,7 +10,7 @@ import { unlock } from '../src/passwordGate';
 // './openRoute'から読み込んでいるので、そのモジュールごと差し替える。
 vi.mock('../src/openRoute', () => ({ openUrl: vi.fn() }));
 
-const SESSION_KEY = 'route-auto-input-csv:session';
+const SESSION_KEY = 'route-auto-input-yakkyoku:session';
 
 async function waitFor(assertion: () => void): Promise<void> {
   await vi.waitFor(assertion, { timeout: 2000, interval: 5 });
@@ -28,7 +28,7 @@ beforeEach(async () => {
   // ロック画面自体を検証するテスト以外は、ロックを経由せずアプリの中身を直接検証したいので、
   // 既定で解錠しておく。
   unlock();
-  await deleteDB('route-auto-input-csv');
+  await deleteDB('route-auto-input-yakkyoku');
   // vi.resetModules() はモジュールの読み込みキャッシュを消すだけで、
   // vi.mock('../src/openRoute', ...) が作ったモック関数の呼び出し履歴は
   // テストをまたいで残る。呼び出し回数を検証するテストのために、ここでクリアする。
@@ -623,7 +623,7 @@ describe('合言葉のロック画面', () => {
   it('正しい合言葉を入れると、中身(一覧)が表示される', async () => {
     await import('../src/main');
     const input = el<HTMLInputElement>('[data-testid="password-input"]')!;
-    input.value = 'houmon-csv2026';
+    input.value = 'houmon-ph2026';
     el<HTMLButtonElement>('[data-testid="password-submit"]')!.click();
 
     await waitFor(() => expect(el('[data-testid="new-button"]')).not.toBeNull());
@@ -633,7 +633,7 @@ describe('合言葉のロック画面', () => {
   it('一度解錠すると、次に読み込んだとき(同じブラウザ)はロック画面を経由しない', async () => {
     await import('../src/main');
     const input = el<HTMLInputElement>('[data-testid="password-input"]')!;
-    input.value = 'houmon-csv2026';
+    input.value = 'houmon-ph2026';
     el<HTMLButtonElement>('[data-testid="password-submit"]')!.click();
     await waitFor(() => expect(el('[data-testid="new-button"]')).not.toBeNull());
 

@@ -10,8 +10,8 @@
 
 import { renderMessage } from './views/common';
 
-const SITE_PASSWORD = 'houmon-csv2026';
-const UNLOCK_KEY = 'route-auto-input-csv:unlocked';
+const SITE_PASSWORD = 'houmon-ph2026';
+const UNLOCK_KEY = 'route-auto-input-yakkyoku:unlocked';
 
 export function checkPassword(input: string): boolean {
   return input === SITE_PASSWORD;

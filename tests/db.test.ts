@@ -20,7 +20,7 @@ import type { Patient } from '../src/types';
 // 前のテストのデータが次のテストへ漏れる。
 beforeEach(async () => {
   await closeDbForTest();
-  await deleteDB('route-auto-input-csv');
+  await deleteDB('route-auto-input-yakkyoku');
 });
 
 describe('患者の保存と取得', () => {
