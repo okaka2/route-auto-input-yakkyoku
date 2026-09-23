@@ -121,7 +121,7 @@ describe('画面の文言(禁止語が出ない)', () => {
   });
 
   it('地図: 0件・1本・分割・開いた後', () => {
-    const handlers = { onOpenRoute: noop, onBack: noop, onChooseStops: noop, onShare: noop };
+    const handlers = { onOpenRoute: noop, onBack: noop, onChooseStops: noop, onShare: noop, onCopyLink: noop };
     const at = new Date(2026, 8, 21, 14, 32).toISOString();
     for (const [label, state, opened] of [
       ['0件', createInitialState([]), new Map<number, string>()],

@@ -12,6 +12,8 @@ export type RouteMapHandlers = {
   onChooseStops(): void;
   /** 「ルートを共有」。確認と共有(LINEなど)は呼び出し側が行う。 */
   onShare(): void;
+  /** 「リンクをコピー」。共有メニューを使わず、URLをコピーする(PC向け)。 */
+  onCopyLink(): void;
 };
 
 /** done: 開いた / next: 次に開く(最初の未開封) / later: それ以降 */
@@ -71,11 +73,22 @@ function renderShare(handlers: RouteMapHandlers): HTMLElement {
   button.textContent = 'ルートを共有(LINEなど)';
   button.addEventListener('click', () => handlers.onShare());
 
+  const copy = document.createElement('button');
+  copy.type = 'button';
+  copy.className = 'block';
+  copy.dataset.testid = 'copy-route-link';
+  copy.textContent = 'リンクをコピー';
+  copy.addEventListener('click', () => handlers.onCopyLink());
+
+  const buttons = document.createElement('div');
+  buttons.className = 'share-buttons';
+  buttons.append(button, copy);
+
   const note = document.createElement('p');
   note.className = 'hint';
   note.textContent = '受け取った人は、URLを開くだけで同じルートの地図を使えます。案内は開いた人の現在地から始まります。';
 
-  card.append(button, note);
+  card.append(buttons, note);
   return card;
 }
 

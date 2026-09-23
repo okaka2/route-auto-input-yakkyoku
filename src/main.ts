@@ -19,7 +19,7 @@ import { checkPassword, isUnlocked, renderPasswordGate, unlock } from './passwor
 import { createPatient, updatePatientFields } from './patient';
 import { splitIntoRoutes } from './routeSplitter';
 import { clearSession, loadSession, saveSession } from './session';
-import { buildShareText, shareText } from './share';
+import { buildShareText, copyText, shareText } from './share';
 import { registerServiceWorkerUpdates } from './swUpdate';
 import {
   clearSelection,
@@ -375,30 +375,56 @@ function handleOpenRoute(routeIndex: number): void {
  * スマホでは共有メニュー(LINEなど)、それが無いPCなどではクリップボードへコピーする。
  */
 async function handleShareRoutes(): Promise<void> {
+  const text = confirmedShareText();
+  if (text === null) {
+    return;
+  }
+  try {
+    const result = await shareText(text);
+    if (result === 'copied') {
+      showCopiedMessage();
+    }
+  } catch {
+    setState(withMessage(state, { kind: 'error', text: 'ルートを共有できませんでした。' }));
+  }
+}
+
+/** 地図の画面の「リンクをコピー」。共有メニューを使わず、必ずコピーする(PC向け)。 */
+async function handleCopyRouteLink(): Promise<void> {
+  const text = confirmedShareText();
+  if (text === null) {
+    return;
+  }
+  try {
+    await copyText(text);
+    showCopiedMessage();
+  } catch {
+    setState(withMessage(state, { kind: 'error', text: 'リンクをコピーできませんでした。' }));
+  }
+}
+
+/** 住所が送信先へ渡ることを確認し、許可されたら共有用のテキストを返す。取りやめなら null。 */
+function confirmedShareText(): string | null {
   const addresses = selectedPatients(state).map((patient) => patient.address);
   if (addresses.length === 0) {
-    return;
+    return null;
   }
   const question =
     `訪問先の住所(${addresses.length}件)が、送った相手と、送るのに使うアプリ(LINEなど)に渡ります。` +
     '名前は含まれません。共有しますか?';
   if (!window.confirm(question)) {
-    return;
+    return null;
   }
-  try {
-    const text = buildShareText(addresses, MAX_STOPS_PER_ROUTE, DEFAULT_MAP_PROVIDER);
-    const result = await shareText(text);
-    if (result === 'copied') {
-      setState(
-        withMessage(state, {
-          kind: 'info',
-          text: 'ルートのURLをコピーしました。LINEなどに貼り付けて送ってください。',
-        }),
-      );
-    }
-  } catch {
-    setState(withMessage(state, { kind: 'error', text: 'ルートを共有できませんでした。' }));
-  }
+  return buildShareText(addresses, MAX_STOPS_PER_ROUTE, DEFAULT_MAP_PROVIDER);
+}
+
+function showCopiedMessage(): void {
+  setState(
+    withMessage(state, {
+      kind: 'info',
+      text: 'ルートのURLをコピーしました。LINEなどに貼り付けて送ってください。',
+    }),
+  );
 }
 
 function handleExport(): void {
@@ -532,6 +558,9 @@ function renderScreen(): HTMLElement {
         onChooseStops: () => setState(withScreen(state, { name: 'list' })),
         onShare: () => {
           void handleShareRoutes();
+        },
+        onCopyLink: () => {
+          void handleCopyRouteLink();
         },
       });
     case 'settings':

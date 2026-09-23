@@ -12,6 +12,7 @@ const handlers = (): RouteMapHandlers => ({
   onBack: vi.fn(),
   onChooseStops: vi.fn(),
   onShare: vi.fn(),
+  onCopyLink: vi.fn(),
 });
 
 function makeStops(count: number): Patient[] {
@@ -237,6 +238,16 @@ describe('renderRouteMap: ルートの共有', () => {
     expect(button.textContent).toContain('ルートを共有');
     button.click();
     expect(spies.onShare).toHaveBeenCalledTimes(1);
+  });
+
+  it('「リンクをコピー」ボタンも出し、押すと onCopyLink が呼ばれる', () => {
+    const spies = handlers();
+    const element = render(stateWithSelection(3), new Map(), spies);
+    const button = element.querySelector<HTMLButtonElement>('[data-testid="copy-route-link"]')!;
+    expect(button.textContent).toContain('リンクをコピー');
+    button.click();
+    expect(spies.onCopyLink).toHaveBeenCalledTimes(1);
+    expect(spies.onShare).not.toHaveBeenCalled();
   });
 
   it('共有すると、開いた人の現在地から始まることを添えて案内する', () => {

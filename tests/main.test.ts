@@ -700,6 +700,32 @@ describe('地図の画面からルートを共有', () => {
     expect(text).not.toContain('山田太郎');
   });
 
+  it('「リンクをコピー」は、共有メニューがあっても使わずにコピーして案内する', async () => {
+    const share = vi.fn();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { ...window.navigator, share, clipboard: { writeText } });
+    await openMapWithOnePatient();
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    el<HTMLButtonElement>('[data-testid="copy-route-link"]')!.click();
+
+    await waitFor(() => expect(el('.message')?.textContent).toContain('コピーしました'));
+    expect(String(writeText.mock.calls[0]![0])).toContain('https://www.google.com/maps/dir/');
+    expect(share).not.toHaveBeenCalled();
+  });
+
+  it('「リンクをコピー」も、確認でキャンセルするとコピーしない', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { ...window.navigator, clipboard: { writeText } });
+    await openMapWithOnePatient();
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+    el<HTMLButtonElement>('[data-testid="copy-route-link"]')!.click();
+
+    expect(window.confirm).toHaveBeenCalled();
+    expect(writeText).not.toHaveBeenCalled();
+  });
+
   it('共有メニューが無い端末では、コピーして案内する', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { ...window.navigator, share: undefined, clipboard: { writeText } });

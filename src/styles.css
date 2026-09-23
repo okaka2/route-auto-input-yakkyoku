@@ -508,6 +508,22 @@ button.label-filter-button.active {
   gap: 0.75rem;
 }
 
+/* 共有の2つのボタン(共有メニュー・リンクをコピー)。幅が足りなければ縦に並ぶ。 */
+.share-card {
+  margin-top: 0.75rem;
+}
+
+.share-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.share-buttons button {
+  flex: 1 1 12rem;
+}
+
 .route-card {
   padding: var(--gap);
   border: 1px solid var(--border);

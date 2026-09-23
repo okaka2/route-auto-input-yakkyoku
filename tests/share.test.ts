@@ -1,6 +1,26 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { googleMapsProvider } from '../src/mapProviders';
-import { buildShareText, shareText } from '../src/share';
+import { buildShareText, copyText, shareText } from '../src/share';
+
+describe('copyText', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('共有メニューがあっても使わず、クリップボードにコピーする', async () => {
+    const share = vi.fn();
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { share, clipboard: { writeText } });
+    await copyText('本文');
+    expect(writeText).toHaveBeenCalledWith('本文');
+    expect(share).not.toHaveBeenCalled();
+  });
+
+  it('クリップボードが使えなければ例外を投げる', async () => {
+    vi.stubGlobal('navigator', {});
+    await expect(copyText('本文')).rejects.toThrow();
+  });
+});
 
 const addresses = (count: number) => Array.from({ length: count }, (_, i) => `東京都${i + 1}-1`);
 

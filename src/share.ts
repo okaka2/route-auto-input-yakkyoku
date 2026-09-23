@@ -31,6 +31,17 @@ export function buildShareText(
 export type ShareResult = 'shared' | 'copied' | 'cancelled';
 
 /**
+ * 共有メニューを使わず、必ずクリップボードにコピーする(「リンクをコピー」ボタン用)。
+ * PCのブラウザでは共有メニューがOSの共有画面になり使いにくいため、別に用意している。
+ */
+export async function copyText(text: string): Promise<void> {
+  if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') {
+    throw new Error('この端末ではコピーできませんでした。');
+  }
+  await navigator.clipboard.writeText(text);
+}
+
+/**
  * スマホでは標準の共有メニュー(LINEなどを選べる)を開く。
  * 共有メニューが無い環境(PCのブラウザなど)では、クリップボードにコピーする。
  */
@@ -46,9 +57,6 @@ export async function shareText(text: string): Promise<ShareResult> {
       throw error;
     }
   }
-  if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-    await navigator.clipboard.writeText(text);
-    return 'copied';
-  }
-  throw new Error('この端末では共有できませんでした。');
+  await copyText(text);
+  return 'copied';
 }
